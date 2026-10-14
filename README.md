@@ -29,10 +29,11 @@ $env:DSH_CLI = "C:\Users\<你>\tools\node_global\node_modules\@deepseek-ai\dsh\l
 npm run dsh:web
 ```
 
-从源码首次安装（在本项目目录执行；`npm install` 会通过 `prepare` 自动构建）：
+从源码首次安装（在本项目目录执行；`npm install` 后需要 `npm run build` —— 构建产物 `lib/` 已随仓库提交，因此从 Git 或 tgz 安装的消费方不需要自己构建）：
 
 ```sh
 npm install
+npm run build
 npx --yes @deepseek-ai/dsh@0.2.0-rc.2 plugin --profile web add /你的绝对路径/dsh-wechat-channel
 npm run dsh:web
 ```
