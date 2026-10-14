@@ -4,13 +4,20 @@ import { mkdtemp, writeFile, rm, symlink, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Files } from "../src/core/files.js";
-test("outbound file snapshot excludes escaping symlinks and validates saved bytes", async () => {
+test("outbound file snapshot excludes escaping symlinks and validates saved bytes", async (t) => {
   const root = await mkdtemp(join(tmpdir(), "wechat-files-"));
   try {
     const project = join(root, "project");
     await mkdir(project);
     await writeFile(join(root, "secret"), "secret");
-    await symlink(join(root, "secret"), join(project, "link"));
+    try {
+      await symlink(join(root, "secret"), join(project, "link"));
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (code !== "EPERM" && code !== "EACCES") throw error;
+      t.skip("symlinks need Developer Mode or elevation on Windows");
+      return;
+    }
     const f = new Files(join(root, "blobs"));
     await assert.rejects(
       f.snapshot(join(project, "link"), [project]),

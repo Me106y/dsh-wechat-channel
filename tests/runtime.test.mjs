@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, writeFile, rm, symlink } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { assertProfileRuntimeIsShared } from "../scripts/dsh-runtime.mjs";
-test("runtime guard rejects same-version physical duplicates and accepts Host symlinks", async () => {
+test("runtime guard rejects same-version physical duplicates and accepts Host symlinks", async (t) => {
   const dir = await mkdtemp(join(tmpdir(), "dsh-runtime-guard-"));
   try {
     const modules = join(dir, "install/node_modules/@deepseek-ai"),
@@ -29,7 +29,13 @@ test("runtime guard rejects same-version physical duplicates and accepts Host sy
       /duplicate runtime packages/,
     );
     await rm(local, { recursive: true });
-    await symlink(host, local);
+    try {
+      await symlink(host, local);
+    } catch (error) {
+      if (error.code !== "EPERM" && error.code !== "EACCES") throw error;
+      t.skip("symlinks need Developer Mode or elevation on Windows");
+      return;
+    }
     await assert.doesNotReject(assertProfileRuntimeIsShared({ cli }, home));
   } finally {
     await rm(dir, { recursive: true, force: true });
