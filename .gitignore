@@ -1,0 +1,8 @@
+node_modules/
+lib/
+*.tgz
+.runtime/
+coverage/
+.DS_Store
+
+.playwright-cli/

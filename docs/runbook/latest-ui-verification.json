@@ -1,0 +1,63 @@
+{
+  "verifiedAt": "2026-09-11T05:55:00Z",
+  "environment": {
+    "dshCli": "0.1.5-rc.1",
+    "dshComponents": "0.1.5-rc.2",
+    "mode": "isolated real Web profile",
+    "browser": "Playwright Chromium, independent context"
+  },
+  "checks": [
+    {
+      "name": "official browser launch token exchange",
+      "result": "passed",
+      "evidence": "redirected to clean root URL; browser cookie authenticated plugin requests"
+    },
+    {
+      "name": "three settings pages",
+      "result": "passed",
+      "evidence": "connection/session, messages/attachments, execution/confirmation pages rendered"
+    },
+    {
+      "name": "real session enumeration and binding",
+      "result": "passed",
+      "evidence": "two real DSH sessions available; smoke session selected and binding saved"
+    },
+    {
+      "name": "native session navigation",
+      "result": "passed",
+      "evidence": "open DSH session closed settings and displayed native conversation and trajectory tabs"
+    },
+    {
+      "name": "iLink pairing QR request",
+      "result": "passed",
+      "evidence": "QR image visible, complete and naturalWidth > 0; no scan performed"
+    },
+    {
+      "name": "browser authentication expiry and recovery",
+      "result": "passed",
+      "evidence": "clearing isolated cookies produced 401 guidance; reopening official launch link restored authenticated access"
+    },
+    {
+      "name": "two same-origin tabs",
+      "result": "passed",
+      "evidence": "status endpoint HTTP 200 in 4 ms"
+    },
+    {
+      "name": "three same-origin tabs concurrent refresh",
+      "result": "passed",
+      "evidence": "status/sessions/messages/interactions all HTTP 200 in 3-6 ms"
+    }
+  ],
+  "findings": [
+    "Latest settings.section, sessions.open, ModuleLoader contracts unchanged.",
+    "Latest host uses node:http; browser HMR uses one EventSource per tab and API Gateway uses WebSocket.",
+    "Refresh error repetition reproduced on cookie removal; source now deduplicates failures and separates refresh errors from command errors.",
+    "Browser 15-second write deadline was shorter than Worker 60-second RPC deadline; POST now allows 65 seconds, GET remains 15 seconds.",
+    "Browser 15-second pairing/start deadline was shorter than Worker 60-second RPC deadline; pairing/start now allows 65 seconds, other requests remain 15 seconds."
+  ],
+  "limits": [
+    "No actual WeChat scan, account binding or message exchange performed.",
+    "Plugin message table empty in isolated profile; real image/file receive/send not browser-validated here.",
+    "Deduplication and transport/body error message changes followed initial browser pass and require rebuilt asset check; client unit tests 7/7 passed."
+  ]
+}

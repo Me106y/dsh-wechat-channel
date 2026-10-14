@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-09-11T05:10:36.379Z",
+  "host": "http://127.0.0.1:4402",
+  "bootManifestEntry": "{\"id\":\"dsh-wechat-channel\",\"url\":\"/plugins/dsh-wechat-channel/client.js?rev=2bfe403a78d4\",\"rev\":\"2bfe403a78d4\",\"inject\":[\"@deepseek-ai/dsh-client-runtime\",\"@deepseek-ai/dsh-client-ui-settings\"]}",
+  "clientHttpStatus": 200,
+  "clientLoaderRegistration": true,
+  "pairingState": "wait",
+  "qrReturned": true,
+  "ownerBound": false,
+  "sessionCount": 1,
+  "visualPanelWidth": 557,
+  "visualPanelScrollWidth": 557,
+  "notes": [
+    "Real DSH settings section visible",
+    "No WeChat scan, owner confirmation, credentials or LLM call",
+    "Native console had non-diagnostic time out/unhandled promise entries during host restarts; panel API and QR succeeded"
+  ]
+}

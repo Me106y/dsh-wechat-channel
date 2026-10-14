@@ -1,0 +1,39 @@
+{
+  "type": "self_review",
+  "scope": "设计完整性，不是运行验证",
+  "score": 86,
+  "categories": {
+    "completeness": 29,
+    "evidence_quality": 24,
+    "consistency": 18,
+    "executability": 15
+  },
+  "design_blockers": [],
+  "release_gates": [
+    "G1",
+    "G2",
+    "G3",
+    "G4",
+    "G5"
+  ],
+  "warnings": [
+    "实际 DSH 版本与源码基线的兼容性待确认",
+    "iLink 身份、消息唯一键、媒体与发送幂等待验证",
+    "提交对账、双端交互、Trace 导航需真实验证"
+  ],
+  "suggestions": [
+    "M0 输出版本能力矩阵和 SDK 映射"
+  ],
+  "checks_performed": [
+    "章节与字段",
+    "本地链接",
+    "状态与数据模型人工对照",
+    "官方固定 commit 接口核对"
+  ],
+  "not_performed": [
+    "未实现插件",
+    "未安装运行插件",
+    "未登录微信",
+    "未运行用户 DSH 实测"
+  ]
+}

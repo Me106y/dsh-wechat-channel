@@ -1,0 +1,356 @@
+{
+  "doc_meta": {
+    "title": "DSH 个人微信通道插件设计方案",
+    "status": "design_draft",
+    "owners": [],
+    "reviewers": [],
+    "related_links": [
+      "wechat-plugin.md"
+    ],
+    "source_commit": "c291e7961a515f6d7af9304e7fd1d257929aef26"
+  },
+  "glossary": [
+    {
+      "term": "Submission",
+      "definition": "交接给 DSH 的持久化提交记录",
+      "source_ref": "主方案 §1"
+    },
+    {
+      "term": "Outbox",
+      "definition": "微信待投递记录",
+      "source_ref": "主方案 §1"
+    }
+  ],
+  "requirement_summary": {
+    "background": "通过个人微信与电脑端 DSH 通信",
+    "goals": [
+      "单人绑定",
+      "文本图片文件双向",
+      "持久化",
+      "可视化",
+      "复用 Trace"
+    ],
+    "non_goals": [
+      "多用户群聊",
+      "自建 Runtime/Trace",
+      "云中继"
+    ],
+    "scope": "完整第一版",
+    "constraints": [
+      "独立实现，不引入或复制个人桥接仓库",
+      "不运行 Go 构建测试命令"
+    ],
+    "assumptions": [
+      "Host 持续运行",
+      "插件与目标 Agent 同 Host"
+    ],
+    "open_questions": [
+      "G1 DSH 兼容性",
+      "G2 iLink 协议",
+      "G3 持久化对账",
+      "G4 双端交互",
+      "G5 导航"
+    ]
+  },
+  "overall_design": {
+    "architecture_summary": "单包，Host 单写 SQLite，受管 Worker 通过 IPC 处理 iLink I/O，Client 复用 DSH UI",
+    "key_decisions": [
+      {
+        "decision": "优先获取活跃 Agent",
+        "rationale": "共享唯一执行实例",
+        "alternatives": [
+          "总是恢复会话"
+        ],
+        "impact": "区分借用与 Handle 所有权",
+        "evidence_refs": [
+          "R1",
+          "R2"
+        ]
+      },
+      {
+        "decision": "提交对账",
+        "rationale": "DSH 与 SQLite 无原子事务",
+        "alternatives": [
+          "失败直接重试"
+        ],
+        "impact": "保留 uncertain 状态",
+        "evidence_refs": [
+          "R1",
+          "R2"
+        ]
+      }
+    ],
+    "business_flow": "配对→落库→附件→DSH→Outbox→微信",
+    "architecture_diagrams": [
+      "主方案 §3.1"
+    ]
+  },
+  "detailed_design": {
+    "modules": [
+      {
+        "name": "host",
+        "responsibility": "持久化与协调",
+        "inputs": [
+          "见主方案 §4–5"
+        ],
+        "outputs": [
+          "见主方案 §4–5"
+        ],
+        "dependencies": [
+          "SQLite/DshPort"
+        ],
+        "change_points": [
+          "独立新建"
+        ],
+        "risks": [
+          "版本与故障边界见 G1–G5"
+        ],
+        "evidence_refs": [
+          "R1"
+        ]
+      },
+      {
+        "name": "worker",
+        "responsibility": "iLink I/O",
+        "inputs": [
+          "见主方案 §4–5"
+        ],
+        "outputs": [
+          "见主方案 §4–5"
+        ],
+        "dependencies": [
+          "iLink/CDN"
+        ],
+        "change_points": [
+          "独立新建"
+        ],
+        "risks": [
+          "版本与故障边界见 G1–G5"
+        ],
+        "evidence_refs": [
+          "R6"
+        ]
+      },
+      {
+        "name": "dsh-adapter",
+        "responsibility": "映射 SDK",
+        "inputs": [
+          "见主方案 §4–5"
+        ],
+        "outputs": [
+          "见主方案 §4–5"
+        ],
+        "dependencies": [
+          "DSH SDK"
+        ],
+        "change_points": [
+          "独立新建"
+        ],
+        "risks": [
+          "版本与故障边界见 G1–G5"
+        ],
+        "evidence_refs": [
+          "R2"
+        ]
+      },
+      {
+        "name": "client",
+        "responsibility": "管理面板",
+        "inputs": [
+          "见主方案 §4–5"
+        ],
+        "outputs": [
+          "见主方案 §4–5"
+        ],
+        "dependencies": [
+          "DSH Client API"
+        ],
+        "change_points": [
+          "独立新建"
+        ],
+        "risks": [
+          "版本与故障边界见 G1–G5"
+        ],
+        "evidence_refs": [
+          "R5"
+        ]
+      },
+      {
+        "name": "media",
+        "responsibility": "附件管理",
+        "inputs": [
+          "见主方案 §4–5"
+        ],
+        "outputs": [
+          "见主方案 §4–5"
+        ],
+        "dependencies": [
+          "磁盘/DSH 附件"
+        ],
+        "change_points": [
+          "独立新建"
+        ],
+        "risks": [
+          "版本与故障边界见 G1–G5"
+        ],
+        "evidence_refs": [
+          "R3"
+        ]
+      }
+    ]
+  },
+  "api_contracts": {
+    "interface_changes": [
+      "DshPort §5",
+      "IPC v1 §5.1",
+      "wechat namespace §5.2"
+    ],
+    "data_schema_changes": [
+      "accounts",
+      "channel_state",
+      "bindings",
+      "messages",
+      "attachments",
+      "submissions",
+      "outbox",
+      "interactions",
+      "session_checkpoints",
+      "channel_events"
+    ]
+  },
+  "architecture_metrics": {
+    "security": {
+      "checks": [
+        "owner",
+        "epoch",
+        "路径边界"
+      ],
+      "risks": [
+        "身份不确定",
+        "文件泄漏"
+      ],
+      "mitigations": [
+        "显式配对",
+        "受控附件工具"
+      ]
+    },
+    "reliability": {
+      "boundaries": [
+        "DSH/SQLite 非原子",
+        "发送结果可能未知"
+      ],
+      "isolation": [
+        "受管 Worker"
+      ],
+      "redundancy": [
+        "迁移前备份"
+      ],
+      "degradation": [
+        "uncertain 暂停",
+        "等待上下文"
+      ]
+    },
+    "compatibility": {
+      "items": [
+        "G1-G5",
+        "锁定 peerDependencies"
+      ]
+    },
+    "observability": {
+      "metrics": [
+        "队列年龄",
+        "重连",
+        "附件占用"
+      ],
+      "logs": [
+        "标识与状态，不含敏感正文"
+      ],
+      "alerts": [
+        "面板故障提示"
+      ]
+    }
+  },
+  "quality_plan": {
+    "rollout": {
+      "strategy": "开发 profile→真实账号→干净 profile→实际 profile",
+      "feature_flags": [
+        "通道启停"
+      ]
+    },
+    "rollback": {
+      "strategy": "停用、归档、回退包；恢复库后先对账",
+      "trigger_conditions": [
+        "重复执行",
+        "丢消息",
+        "越权",
+        "附件损坏"
+      ]
+    },
+    "testing": {
+      "unit": "状态与身份",
+      "integration": "事务/IPC/媒体/重启",
+      "regression": "DSH 契约",
+      "qa": "真实微信与面板"
+    },
+    "checklist": [
+      "wechat-plugin-checklist.md"
+    ]
+  },
+  "errors_and_copy": [
+    {
+      "code": "SUBMISSION_UNCERTAIN",
+      "copy": "执行状态待核对，已暂停重复提交"
+    },
+    {
+      "code": "DELIVERY_UNCERTAIN",
+      "copy": "微信可能已收到，发送结果未确认"
+    }
+  ],
+  "references": [
+    {
+      "id": "R1",
+      "source_ref": "主方案 §10"
+    },
+    {
+      "id": "R2",
+      "source_ref": "主方案 §10"
+    },
+    {
+      "id": "R3",
+      "source_ref": "主方案 §10"
+    },
+    {
+      "id": "R4",
+      "source_ref": "主方案 §10"
+    },
+    {
+      "id": "R5",
+      "source_ref": "主方案 §10"
+    },
+    {
+      "id": "R6",
+      "source_ref": "主方案 §10"
+    },
+    {
+      "id": "R7",
+      "source_ref": "主方案 §10"
+    }
+  ],
+  "task_breakdown": {
+    "milestones": [
+      "M0 核验",
+      "M1 工程存储",
+      "M2 文本",
+      "M3 媒体",
+      "M4 面板确认",
+      "M5 验收"
+    ],
+    "owners": [],
+    "dependencies": [
+      "M0→M1→M2→M3/M4→M5"
+    ],
+    "risks": [
+      "目标环境待核验"
+    ]
+  }
+}

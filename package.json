@@ -1,0 +1,84 @@
+{
+  "name": "dsh-wechat-channel",
+  "version": "0.1.0",
+  "description": "Personal WeChat channel for DeepSeek Harness",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": [
+    "lib",
+    "README.md",
+    "docs",
+    "cordis.patch.yml",
+    "scripts/start-dsh.mjs",
+    "scripts/dsh-runtime.mjs"
+  ],
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepare": "npm run build",
+    "prepack": "npm run build",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts tests/*.test.mjs",
+    "check": "npm run typecheck && npm test && npm run build",
+    "format": "prettier --write src tests scripts package.json tsconfig.json",
+    "format:check": "prettier --check src tests scripts package.json tsconfig.json",
+    "dsh:web": "node scripts/start-dsh.mjs",
+    "smoke:dsh": "node scripts/dsh-smoke.mjs"
+  },
+  "dependencies": {
+    "json-bigint": "1.0.0",
+    "qrcode": "1.5.4"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.4",
+    "@deepseek-ai/dsh-agent": ">=0.2.0-rc.2 <0.3.0-0"
+  },
+  "devDependencies": {
+    "@types/json-bigint": "1.0.4",
+    "@types/node": "24.7.2",
+    "@types/qrcode": "1.5.5",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "esbuild": "0.25.10",
+    "prettier": "^3.6.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "@deepseek-ai/cordis": "~4.0.4"
+  },
+  "dsh": {
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings"
+      ],
+      "platform": "web"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-agent": {
+      "optional": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EricOo0/dsh-wechat-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/EricOo0/dsh-wechat-plugin/issues"
+  }
+}
