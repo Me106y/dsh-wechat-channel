@@ -8,8 +8,6 @@
 
 插件 **0.1.0** 适配 **DSH `0.2.0-rc.2`**（npm 当前 latest）。Node 22.18+；本项目验证环境为 Node 24.21.0 / Windows 11。DSH 0.1.5 及更早系列请使用上游插件版本，不要混用组件。
 
-本项目由 [`EricOo0/dsh-wechat-plugin`](https://github.com/EricOo0/dsh-wechat-plugin)（0.2.1）派生并改名而来：包名与插件 id 改为 `dsh-wechat-channel`，避免与 npm 上同名的 `dsh-wechat`、`dsh-wechat-plugin`、`dsh-wechat-bridge` 冲突，并完成了对 DSH 0.2 运行时的适配。改了什么见[兼容性记录](docs/runbook/compatibility.md)。
-
 本项目目录中的推荐启动方式：
 
 ```sh
