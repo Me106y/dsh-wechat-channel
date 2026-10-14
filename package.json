@@ -76,9 +76,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/EricOo0/dsh-wechat-plugin.git"
+    "url": "git+https://github.com/Me106y/dsh-wechat-channel.git"
   },
+  "homepage": "https://github.com/Me106y/dsh-wechat-channel#readme",
   "bugs": {
-    "url": "https://github.com/EricOo0/dsh-wechat-plugin/issues"
+    "url": "https://github.com/Me106y/dsh-wechat-channel/issues"
   }
 }
